@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --account=bgmp          ### SLURM account which will be charged for the job
 #SBATCH --partition=bgmp        ### Partition (like a queue in PBS)
-#SBATCH --job-name=HiWorld      ### Job Name
+#SBATCH --job-name=PS6          ### Job Name
 #SBATCH --output=Hi.out         ### File in which to store job output
 #SBATCH --error=Hi.err          ### File in which to store job error messages
 #SBATCH --time=0-00:01:00       ### Wall clock time limit in Days-HH:MM:SS
@@ -14,4 +14,4 @@
 # Load modules
 
 # SCRIPT BELOW
-./a.out
+
