@@ -6,7 +6,9 @@ from collections import defaultdict
 parser = argparse.ArgumentParser(description='This file is for PS5 for UO BGMP. We are creating and counting kmers')
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', type=str, help='file to parse')
+parser.add_argument('-o', type=str, help='where to output buckets')
 args = parser.parse_args()
+
 
 K_MER_LENGTH = 49
 
@@ -23,11 +25,13 @@ k_mer_coverages = []
 with open(args.f,"r") as fafp:
     for line in fafp:
         if line[0] == ">":
-            matches = re.match(".+_.+_.+_(.+)_.+_(.+)",line)
-            k_mer_lengths.append(int(matches.groups()[0]))
-            k_mer_coverages.append(float(matches.groups()[1]))
-            kmer_coverages_sum += float(matches.groups()[1])
-            contig_length = int(matches.groups()[0]) + K_MER_LENGTH - 1
+            matches = re.match(".+_.+_.+_(.+)_.+_(.+)",line)    
+            k_mer_length = int(matches.groups()[0])
+            k_mer_coverage = float(matches.groups()[1])
+            k_mer_lengths.append(k_mer_length)
+            k_mer_coverages.append(k_mer_coverage)
+            kmer_coverages_sum += k_mer_coverage
+            contig_length = k_mer_length + K_MER_LENGTH - 1
             contig_lengths.append(contig_length)
             max_contig_length = max(max_contig_length, contig_length)
             sum_nucleotides_from_header += contig_length
@@ -51,15 +55,20 @@ for length in contig_lengths:
     lower = length // bucket_size
     length_counts[lower*bucket_size] += 1
 
-print("# contig length\tNumber of contigs in this category")
-for key in sorted(length_counts):
-    print(f"{key}\t{length_counts[key]}")
+if args.o != None:
+    out_fi = open(args.o,"w")
+    for key in sorted(length_counts):
+        out_fi.write(f"{key}\t{length_counts[key]}\n")
+else:
+    print("# contig length\tNumber of contigs in this category")
+    for key in sorted(length_counts):
+        print(f"{key}\t{length_counts[key]}")
 
-#print("total length: ", sum_nucleotides_from_header)
-#print("num contigs: ", num_contigs)
-#print("max contig len: ",max_contig_length)
-#print("mean contig length: ",mean_contig_length)
-#print("mean coverage: ",kmer_coverage_mean)
+print("total length: ", sum_nucleotides_from_header)
+print("num contigs: ", num_contigs)
+print("max contig len: ",max_contig_length)
+print("mean contig length: ",mean_contig_length)
+print("mean coverage: ",kmer_coverage_mean)
 
 
 
