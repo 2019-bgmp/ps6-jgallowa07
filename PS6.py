@@ -2,15 +2,21 @@
 import re
 import argparse
 from collections import defaultdict
+from matplotlib import pyplot as plt
 
 parser = argparse.ArgumentParser(description='This file is for PS5 for UO BGMP. We are creating and counting kmers')
 parser = argparse.ArgumentParser()
+
 parser.add_argument('-f', type=str, help='file to parse')
 parser.add_argument('-o', type=str, help='where to output buckets')
+parser.add_argument('-kl', type=int, help='kmer_length')
+parser.add_argument('-cc', type=str, help='coverage cutoff')
+parser.add_argument('-min_contig_lgth', type=str, help='min contig length')
+
 args = parser.parse_args()
 
 
-K_MER_LENGTH = 49
+K_MER_LENGTH = args.kl
 
 sum_nucleotides_from_header = 0
 num_contigs = 0
@@ -57,6 +63,8 @@ for length in contig_lengths:
 
 if args.o != None:
     out_fi = open(args.o,"w")
+    out_fi.write(f"{sum_nucleotides_from_header}\t{num_contigs}\t \
+        {max_contig_length}\t{mean_contig_length}\t{kmer_coverage_mean}\t{N50}\n")
     for key in sorted(length_counts):
         out_fi.write(f"{key}\t{length_counts[key]}\n")
 else:
@@ -64,19 +72,27 @@ else:
     for key in sorted(length_counts):
         print(f"{key}\t{length_counts[key]}")
 
+print("N50: ", N50)
 print("total length: ", sum_nucleotides_from_header)
 print("num contigs: ", num_contigs)
 print("max contig len: ",max_contig_length)
 print("mean contig length: ",mean_contig_length)
 print("mean coverage: ",kmer_coverage_mean)
 
+params_for_plot = f"$k$={args.kl} | cc={args.cc} | mcl={args.min_contig_lgth}"
+plot_name = f"k{args.kl}_cc{args.cc}_mcl{args.min_contig_lgth}.pdf"
+stats_for_plot = f"N50 = {N50}"
+
+fig, ax = plt.subplots(1)
+ax.plot(list(length_counts.keys()),list(length_counts.values()))
+
+ax.set_title("Contig length distribution\nvelvetg Params: "+params_for_plot)
+ax.set_xlabel("bucket size")
+ax.set_ylabel("Number of contigs in this bucket")
+ax.legend([f"N50={N50}"])
+plt.xscale("log")
+plt.yscale("log")
+fig.savefig("plots/"+plot_name)
 
 
-
-
-
-
-            
-
-            
 

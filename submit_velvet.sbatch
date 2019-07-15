@@ -26,8 +26,10 @@ do
         $k -fastq -shortPaired -separate $fq1 $fq2 -fastq -short2 $fq3
     /usr/bin/time -v velvetg output_dir \
         -exp_cov 98.5912995
-    ./PS6.py -f output_dir/contigs.fa
+    #./PS6.py -f output_dir/contigs.fa
         # -o output_dir_$k/contig_analysis.txt.k$k
+    ./PS6.py -f output_dir/contigs.fa \
+        -kl $k
 done
 
 #Part 2
@@ -37,8 +39,10 @@ do
         49 -fastq -shortPaired -separate $fq1 $fq2 -fastq -short2 $fq3
     /usr/bin/time -v velvetg output_dir \
         -exp_cov 98.5912995 -cov_cutoff $cc
-    ./PS6.py -f output_dir/contigs.fa
+    #./PS6.py -f output_dir/contigs.fa
         # -o output_dir_$k/contig_analysis.txt.k$k
+    ./PS6.py -f output_dir/contigs.fa \
+        -kl 49 -cc $cc
 done
 
 #Part 3
@@ -46,7 +50,16 @@ done
     49 -fastq -shortPaired -separate $fq1 $fq2 -fastq -short2 $fq3
 /usr/bin/time -v velvetg output_dir \
     -exp_cov 98.5912995 -cov_cutoff auto -min_contig_lgth 500
-./PS6.py -f output_dir/contigs.fa
+./PS6.py -f output_dir/contigs.fa \
+    -kl 49 -cc auto -min_contig_lgth 500
+
+
+
+
+
+
+
+
 
 
 
