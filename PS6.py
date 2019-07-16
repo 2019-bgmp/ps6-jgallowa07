@@ -18,6 +18,7 @@ args = parser.parse_args()
 
 K_MER_LENGTH = args.kl
 
+# initialize variables
 sum_nucleotides_from_header = 0
 num_contigs = 0
 max_contig_length = 0
@@ -31,21 +32,27 @@ k_mer_coverages = []
 with open(args.f,"r") as fafp:
     for line in fafp:
         if line[0] == ">":
+            
+            # pretty terrible way to do this but it works ...
             matches = re.match(".+_.+_.+_(.+)_.+_(.+)",line)    
             k_mer_length = int(matches.groups()[0])
             k_mer_coverage = float(matches.groups()[1])
             k_mer_lengths.append(k_mer_length)
             k_mer_coverages.append(k_mer_coverage)
             kmer_coverages_sum += k_mer_coverage
+
+            # Algebra from num_kmers = len(seq) + len(k) + 1
             contig_length = k_mer_length + K_MER_LENGTH - 1
             contig_lengths.append(contig_length)
             max_contig_length = max(max_contig_length, contig_length)
             sum_nucleotides_from_header += contig_length
             num_contigs += 1
 
+# final calcs
 mean_contig_length = sum_nucleotides_from_header / num_contigs
 kmer_coverage_mean = kmer_coverages_sum / num_contigs
 
+# weighted median
 contig_lengths.sort()
 running_sum = 0
 N50 = 0
@@ -55,6 +62,7 @@ for length in contig_lengths:
         N50 = length
         break
 
+# common way to bucket a list of numbers 
 bucket_size = 100
 length_counts = defaultdict(int)
 for length in contig_lengths:
@@ -72,6 +80,7 @@ else:
     for key in sorted(length_counts):
         print(f"{key}\t{length_counts[key]}")
 
+# Print stats
 print("N50: ", N50)
 print("total length: ", sum_nucleotides_from_header)
 print("num contigs: ", num_contigs)
@@ -79,6 +88,7 @@ print("max contig len: ",max_contig_length)
 print("mean contig length: ",mean_contig_length)
 print("mean coverage: ",kmer_coverage_mean)
 
+# going to plot here so it plots during run of all parameters
 params_for_plot = f"$k$={args.kl} | cc={args.cc} | mcl={args.min_contig_lgth}"
 plot_name = f"k{args.kl}_cc{args.cc}_mcl{args.min_contig_lgth}.pdf"
 stats_for_plot = f"N50 = {N50}"
